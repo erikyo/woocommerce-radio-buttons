@@ -1,0 +1,37 @@
+{
+	"name": "helgatheviking/woocommerce-radio-buttons",
+	"description": "Woocommerce Radio Buttons",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"homepage": "https://github.com/helgatheviking/woocommerce-radio-buttons.git",
+	"keywords": [
+		"woocommerce",
+		"wordpress"
+	],
+	"support": {
+		"issues": "https://github.com/helgatheviking/woocommerce-radio-buttons/issues"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+		"phpcompatibility/php-compatibility": "^9.3",
+		"phpunit/phpunit": "^8.5",
+		"squizlabs/php_codesniffer": "^3.5",
+		"wp-coding-standards/wpcs": "^2.2",
+		"wp-phpunit/wp-phpunit": "^5.8",
+		"yoast/phpunit-polyfills": "^1.0"
+	},
+	"require": {
+		"composer/installers": "~1.0"
+	},
+	"scripts": {
+		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
+		"lint": "phpcs --standard=phpcs.xml.dist",
+		"test": "phpunit -c phpunit.xml.dist --verbose"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"composer/installers": true
+		}
+	}
+}
