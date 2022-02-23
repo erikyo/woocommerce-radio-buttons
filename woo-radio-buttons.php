@@ -93,6 +93,7 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 
 			$html .= '<div id="radio_variations">';
 
+			/* translators: %s: the name of the attribute, will print something like "Choose color" or "Choose size" */
 			$html .= '<p class="product-attribute attribute-' . $attribute_clean_title . '">' . sprintf( esc_html( __( 'Choose %s', 'woocommerce' ) ), wc_attribute_label( $attribute ) ) . '</p>';
 
 			$html .= sprintf( '<ul id="%s" class="radio__variations--list %s" data-attribute_name="%s">', $id, $class, $args['attribute'] );
@@ -102,7 +103,7 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 				$html    .= '<li class="radio__variations--item radio__none">' .
 					'<input id="radio__' . esc_attr( $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="" ' . checked( sanitize_title( $args['selected'] ), '', false ) . '/>' .
 					'<label class="button" for="radio__' . esc_attr( $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_none_radio', $show_option_none_text, $product ) ) . '</label>' .
-				 '</li>';
+				'</li>';
 			}
 
 			if ( $product && taxonomy_exists( $attribute ) ) {

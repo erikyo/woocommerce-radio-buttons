@@ -1,86 +1,89 @@
-jQuery(document).ready(function($) {
- 
-    /**
-     * Variations form handling
-     */
-    $( '.variations_form' )
+jQuery(document).ready(function ($) {
+	/**
+	 * Variations form handling
+	 */
+	$('.variations_form')
+		.on('wc_variation_form', function (event, form) {
+			$(this).trigger('check_radio_variations');
+		})
 
-        .on( 'wc_variation_form', function( event, form ) {
-            $( this ).trigger( 'check_radio_variations' );
-        } )
-             
-         // Upon changing an option
-        .on( 'change', '.variations input:radio', function( event ) {
+		// Upon changing an option
+		.on('change', '.variations input:radio', function (event) {
+			const $form = $(this).closest('.variations_form');
+			const useAjax = false === $form.data('product_variations');
 
-            var $form    = $(this).closest( '.variations_form' );
-            var useAjax  = false === $form.data( 'product_variations' );
+			$form
+				.find('input[name="variation_id"], input.variation_id')
+				.val('')
+				.change();
+			$form.find('.wc-no-matching-variations').remove();
 
-            $form.find( 'input[name="variation_id"], input.variation_id' ).val( '' ).change();
-            $form.find( '.wc-no-matching-variations' ).remove();
+			if (useAjax) {
+				$form.trigger('check_radio_variations');
+			} else {
+				$form.trigger('woocommerce_variation_select_change');
+				$form.trigger('check_radio_variations');
+			}
 
-            if ( useAjax ) {
-                $form.trigger( 'check_radio_variations' );
-            } else {
-                $form.trigger( 'woocommerce_variation_select_change' );
-                $form.trigger( 'check_radio_variations' );
-            }
+			// Custom event for when variation selection has been changed
+			$form.trigger('woocommerce_variation_has_changed');
+		})
 
-            // Custom event for when variation selection has been changed
-            $form.trigger( 'woocommerce_variation_has_changed' );
-     
-        } )
+		// On clicking the reset variation button
+		.on('click', '.reset_variations', function (event) {
+			event.preventDefault();
 
- 
-        // On clicking the reset variation button
-        .on( 'click', '.reset_variations', function( event ) {
+			$(this)
+				.closest('.variations_form')
+				.find('.variations .radio__variations--list')
+				.each(function () {
+					$(this).find('input:radio').attr('checked', false);
 
-            event.preventDefault();
- 
-            $(this).closest('.variations_form').find( '.variations .radio__variations--list' ).each( function() {
-                $(this).find('input:radio').attr( 'checked', false );
+					const $first_input = $(this).find(
+						'.radio__variations--item:first-child input:radio'
+					);
 
-                var $first_input = $(this).find( '.radio__variations--item:first-child input:radio' );
+					if ('' === $first_input.val()) {
+						$first_input.attr('checked', true);
+					}
+					$first_input.change();
+				});
+		})
 
-                if( '' === $first_input.val() ) {
-                    $first_input.attr( 'checked', true );
-                }
-                $first_input.change();
+		// Custom callback to tell Woo to check variations with our radio attributes.
+		.on('check_radio_variations', function (event) {
+			const chosenAttributes = radioGetChosenAttributes($(this));
+			$(this).trigger('check_variations', chosenAttributes);
+		});
 
-            } );
-        } )
+	/**
+	 * Get chosen attributes from form.
+	 *
+	 * @param  $form
+	 * @return array
+	 */
+	var radioGetChosenAttributes = function ($form) {
+		const data = {};
+		let count = 0;
+		let chosen = 0;
 
-        // Custom callback to tell Woo to check variations with our radio attributes.
-        .on( 'check_radio_variations', function ( event ) {
-            var chosenAttributes = radioGetChosenAttributes( $(this) );
-             $(this).trigger( 'check_variations', chosenAttributes );
-        } );
+		$form.find('.variations .radio__variations--list').each(function () {
+			const attribute_name =
+				$(this).data('attribute_name') ||
+				$(this).find('input:radio').first().attr('name');
+			const value = $(this).find('input:checked').val() || '';
 
+			if (value.length > 0) {
+				chosen++;
+			}
 
-         /**
-         * Get chosen attributes from form.
-         * @return array
-         */
-        var radioGetChosenAttributes = function( $form ) {
-            var data   = {};
-            var count  = 0;
-            var chosen = 0;
-
-            $form.find( '.variations .radio__variations--list' ).each( function() {
-                var attribute_name = $( this ).data( 'attribute_name' ) || $( this ).find( 'input:radio' ).first().attr( 'name' );
-                var value          = $( this ).find( 'input:checked' ).val() || '';
-
-                if ( value.length > 0 ) {
-                    chosen ++;
-                }
-
-                count ++;
-                data[ attribute_name ] = value;
-            });
-
-            return {
-                'count'      : count,
-                'chosenCount': chosen,
-                'data'       : data
-            };
-        };
+			count++;
+			data[attribute_name] = value;
+		});
+		return {
+			count,
+			chosenCount: chosen,
+			data,
+		};
+	};
 });
