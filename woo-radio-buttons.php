@@ -1,15 +1,16 @@
 <?php
-/*
+/**
  * Plugin Name: Woo Radio Buttons
  * Plugin URI: http://designloud.com/downloads/woo-radio-buttons-3.0.zip
- * Description: <strong>This is the radio buttons compatible with Woocommerce 4.2+.<br />
-<strong>If you find this plugin useful please consider <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NUSCJBYCS8UL8" target="_blank">making a donation</a>, because well it wasnt easy getting this puppy goin. Thanks and enjoy!</strong>
+ * Description: <strong>This is the radio buttons compatible with Woocommerce 4.2+.<br /><strong>If you find this plugin useful please consider <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NUSCJBYCS8UL8" target="_blank">making a donation</a>, because well it wasnt easy getting this puppy goin. Thanks and enjoy!</strong>
  * Author: DesignLoud
  * Version: 3.0.0
  * Author URI: http://designloud.com
  * Tested up to: 5.5.0
  * WC tested up to: 4.4.0
  * WC requires at least: 4.3.0
+ *
+ * @package woo_radio_buttons
  */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -45,7 +46,7 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 	/**
 	 * Output a list of variation attributes for use in the cart forms.
 	 *
-	 * @param array $args this plugin options
+	 * @param array $args this plugin options.
 	 *
 	 * @since 2.4.0
 	 */
@@ -75,7 +76,7 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 		$options               = $args['options'];
 		$product               = $args['product'];
 		$attribute             = $args['attribute'];
-		$name                  = $args['name'] ?: $attribute_clean_title;
+		$name                  = empty( $args['name'] ) ?: $attribute_clean_title;
 		$id                    = $args['id'] ? sanitize_html_class( $attribute ) : 'wrc_' . $attribute_clean_title;
 		$class                 = $args['class'] ? sanitize_html_class( $attribute ) : $id;
 		$show_option_none      = boolval( $args['show_option_none'] );
@@ -118,9 +119,9 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 					if ( in_array( $term->slug, $options, true ) ) {
 						$input_id = uniqid( 'attribute_' );
 						$html    .= '<li class="radio__variations--item pa_' . $term->slug . ' radio__term">' .
-						  '<input id="radio__' . esc_attr( $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="' . esc_attr( $term->slug ) . '" ' . checked( sanitize_title( $args['selected'] ), $term->slug, false ) . '/>' .
-						  '<label class="button" for="radio__' . esc_attr( $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name, $term, $attribute, $product ) ) . '</label>' .
-						   '</li>';
+						'<input id="radio__' . esc_attr( $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="' . esc_attr( $term->slug ) . '" ' . checked( sanitize_title( $args['selected'] ), $term->slug, false ) . '/>' .
+						'<label class="button" for="radio__' . esc_attr( $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name, $term, $attribute, $product ) ) . '</label>' .
+						'</li>';
 					}
 				}
 			} else {
@@ -128,9 +129,9 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 					$input_id = uniqid( 'attribute_' );
 					$selected = checked( $args['selected'], sanitize_title( $option ), false );
 					$html    .= '<li class="radio__variations--item pa_' . $option . ' radio__option">' .
-						'<input id="radio__' . esc_attr( $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="' . esc_attr( $option ) . '" ' . $selected . '>' .
-						'<label class="button" for="radio__' . esc_attr( $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $option, null, $attribute, $product ) ) . '</label>' .
-					  '</li>';
+					'<input id="radio__' . esc_attr( $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="' . esc_attr( $option ) . '" ' . $selected . '>' .
+					'<label class="button" for="radio__' . esc_attr( $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $option, null, $attribute, $product ) ) . '</label>' .
+					'</li>';
 				}
 			}
 		}

@@ -15,6 +15,11 @@
 
 	<file>./woo-radio-buttons.php</file>
 
+	// allow ternary operator
+  <rule ref="WordPress.PHP.DisallowShortTernary">
+      <exclude-pattern>/*</exclude-pattern>
+  </rule>
+
 	<!-- Do not require docblocks for unit tests -->
 	<rule ref="Squiz.Commenting.FunctionComment.Missing">
 		<exclude-pattern>tests/*</exclude-pattern>
