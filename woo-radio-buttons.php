@@ -1,61 +1,53 @@
-<?php 
-/* 
- * Plugin Name: Woo Radio Buttons 
- * Plugin URI: http://designloud.com/downloads/woo-radio-buttons-3.0.zip 
- * Description: <strong>This is the radio buttons compatible with Woocommerce 4.2+.<br /> 
-<strong>If you find this plugin useful please consider <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NUSCJBYCS8UL8" target="_blank">making a donation</a>, because well it wasnt easy getting this puppy goin. Thanks and enjoy!</strong> 
- * Author: DesignLoud 
- * Version: 3.0.0 
- * Author URI: http://designloud.com 
+<?php
+/*
+ * Plugin Name: Woo Radio Buttons
+ * Plugin URI: http://designloud.com/downloads/woo-radio-buttons-3.0.zip
+ * Description: <strong>This is the radio buttons compatible with Woocommerce 4.2+.<br />
+<strong>If you find this plugin useful please consider <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NUSCJBYCS8UL8" target="_blank">making a donation</a>, because well it wasnt easy getting this puppy goin. Thanks and enjoy!</strong>
+ * Author: DesignLoud
+ * Version: 3.0.0
+ * Author URI: http://designloud.com
  * Tested up to: 5.5.0
  * WC tested up to: 4.4.0
  * WC requires at least: 4.3.0
- */ 
-
-/**
- * The path of main plugin file
- * 
- * @param array $args Arguments.
- * @since 2.4.0
- * @deprecated 4.0.0
  */
-function wooradio_plugin_path() { 
-  // gets the absolute path to this plugin directory 
-  return untrailingslashit( plugin_dir_path( __FILE__ ) ); 
-} 
+
+if ( ! defined( 'WPINC' ) ) die;
+
+define( 'WCB_PATH', __FILE__ );
+define( 'WCB_VERSION', '3.0.0' );
 
 /**
  * Register scripts
  *
- * @param array $args Arguments.
  * @since 2.4.0
  */
-function register_woo_radio_button_scripts () { 
-	 wp_register_script( 'wc-radio-add-to-cart-variation', plugins_url( 'assets/js/frontend/add-to-cart-variation-radio.js', __FILE__ ), array( 'jquery', 'wc-add-to-cart-variation' ), '4.0.0', true );
-   wp_enqueue_style( 'wc-radio-button-styles', plugins_url( 'assets/css/woo-radio-variations.css', __FILE__ ), array(), '4.0.0', 'all' );
-} 
-add_action( 'wp_enqueue_scripts', 'register_woo_radio_button_scripts' ); 
+function register_woo_radio_button_scripts () {
+	wp_register_script( 'wc-radio-add-to-cart-variation', plugin_dir_url( WCB_PATH ) . 'build/add-to-cart-variation-radio.js', array( 'jquery' ), WCB_VERSION, true );
+	wp_enqueue_style( 'wc-radio-button-styles', plugin_dir_url( WCB_PATH ) . 'build/woo-radio-variations.css', array(), WCB_VERSION );
+}
+add_action( 'wp_enqueue_scripts', 'register_woo_radio_button_scripts' );
 
 /**
  * Load scripts on variable product pages.
  *
- * @param array $args Arguments.
- * @since 4.0.0
+ * @since 3.0.0
  */
 function woo_radio_button_enqueue_scripts () {
-  wp_enqueue_script( 'wc-radio-add-to-cart-variation' );  
-} 
-add_action( 'woocommerce_variable_add_to_cart', 'woo_radio_button_enqueue_scripts' ); 
+  wp_enqueue_script( 'wc-radio-add-to-cart-variation' );
+}
+add_action( 'woocommerce_variable_add_to_cart', 'woo_radio_button_enqueue_scripts' );
 
 
 if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
   /**
    * Output a list of variation attributes for use in the cart forms.
    *
-   * @param array $args Arguments.
+   * @param array $args this plugin options
+   *
    * @since 2.4.0
    */
-  function wc_dropdown_variation_attribute_options( $args = array() ) {
+  function wc_dropdown_variation_attribute_options( array $args = array() ) {
     $args = wp_parse_args(
       apply_filters( 'woocommerce_dropdown_variation_attribute_options_args', $args ),
       array(
@@ -76,14 +68,16 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
       $args['selected'] = isset( $_REQUEST[ $selected_key ] ) ? wc_clean( wp_unslash( $_REQUEST[ $selected_key ] ) ) : $args['product']->get_variation_default_attribute( $args['attribute'] ); // WPCS: input var ok, CSRF ok, sanitization ok.
     }
 
+    $attribute_clean_title = sanitize_title( $args['attribute'] );
+
     $options               = $args['options'];
     $product               = $args['product'];
     $attribute             = $args['attribute'];
-    $name                  = $args['name'] ? $args['name'] : 'attribute_' . sanitize_title( $attribute );
-    $id                    = $args['id'] ? $args['id'] : sanitize_title( $attribute );
-    $class                 = $args['class'];
-    $show_option_none      = (bool) $args['show_option_none'];
-    $show_option_none_text = $args['show_option_none'] ? $args['show_option_none'] : __( 'None', 'woocommerce' ); // We'll do our best to hide the placeholder, but we'll need to show something when resetting options.
+    $name                  = $args['name'] ?: $attribute_clean_title;
+    $id                    = $args['id'] ? sanitize_html_class($attribute) : 'wrc_' . $attribute_clean_title;
+    $class                 = $args['class']  ? sanitize_html_class( $attribute ) : $id;
+    $show_option_none      = boolval($args['show_option_none']);
+    $show_option_none_text = $args['show_option_none'] ?: __( 'None', 'woocommerce' ); // We'll do our best to hide the placeholder, but we'll need to show something when resetting options.
 
     if ( empty( $options ) && ! empty( $product ) && ! empty( $attribute ) ) {
       $attributes = $product->get_variation_attributes();
@@ -94,15 +88,18 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 
     if ( ! empty( $options ) ) {
 
-      $html .= '<fieldset class="radio__variations">';
+      $html .= '<div id="radio_variations">';
 
-      $html .= '<legend>' . sprintf( esc_html( __( 'Choose %s', 'woocommerce' ) ), wc_attribute_label( $attribute ) ) . '</legend>';
+      $html .= '<p class="product-attribute attribute-'.$attribute_clean_title.'">' . sprintf( esc_html( __( 'Choose %s', 'woocommerce' ) ), wc_attribute_label( $attribute ) ) . '</p>';
 
-      $html .= '<ul class="radio__variations--list" data-attribute_name="' . esc_attr( $name ) . '">';
+      $html .= sprintf('<ul id="%s" class="radio__variations--list %s" data-attribute_name="%s">', $id, $class, $args['attribute'] );
 
-      if( $show_option_none ) {      
+      if( $show_option_none ) {
         $input_id = uniqid( 'attribute_' );
-        $html .= '<li class="radio__variations--item"><label for="' . esc_attr(  $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_none_radio', $show_option_none_text, $product ) ) .'</label><input id="' . esc_attr(  $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="" ' . checked( sanitize_title( $args['selected'] ), '', false ) . '/></li>'; 
+        $html .= '<li class="radio__variations--item radio__none">'.
+                    '<input id="radio__' . esc_attr(  $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="" ' . checked( sanitize_title( $args['selected'] ), '', false ) . '/>'.
+                    '<label class="button" for="radio__' . esc_attr(  $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_none_radio', $show_option_none_text, $product ) ) .'</label>'.
+                 '</li>';
       }
 
       if ( $product && taxonomy_exists( $attribute ) ) {
@@ -118,23 +115,26 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
         foreach ( $terms as $term ) {
           if ( in_array( $term->slug, $options, true ) ) {
             $input_id = uniqid( 'attribute_' );
-            $html .= '<li class="radio__variations--item"><label for="' . esc_attr(  $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name, $term, $attribute, $product ) ) .'</label><input id="' . esc_attr(  $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="' . esc_attr( $term->slug ) . '" ' . checked( sanitize_title( $args['selected'] ), $term->slug, false ) . '/></li>';
+            $html .= '<li class="radio__variations--item pa_'. $term->slug .' radio__term">'.
+                        '<input id="radio__' . esc_attr(  $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="' . esc_attr( $term->slug ) . '" ' . checked( sanitize_title( $args['selected'] ), $term->slug, false ) . '/>'.
+                        '<label class="button" for="radio__' . esc_attr(  $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name, $term, $attribute, $product ) ) .'</label>'.
+                     '</li>';
           }
         }
       } else {
         foreach ( $options as $option ) {
           $input_id = uniqid( 'attribute_' );
           $selected = checked( $args['selected'], sanitize_title( $option ), false );
-          $html    .= '<li class="radio__variations--item"><label for="' . esc_attr(  $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $option, null, $attribute, $product ) ) .'</label><input id="' . esc_attr(  $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="' . esc_attr( $option ) . '" ' . $selected . '></li>';
+          $html    .= '<li class="radio__variations--item pa_'. $option .' radio__option">'.
+                        '<input id="radio__' . esc_attr(  $input_id ) . '" type="radio" name="' . esc_attr( $name ) . '" value="' . esc_attr( $option ) . '" ' . $selected . '>'.
+                        '<label class="button" for="radio__' . esc_attr(  $input_id ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $option, null, $attribute, $product ) ) .'</label>'.
+                      '</li>';
         }
       }
     }
 
-    echo '</fieldset>';
+    echo '</div>';
 
     echo apply_filters( 'woocommerce_dropdown_variation_attribute_options_html', $html, $args ); // WPCS: XSS ok.
   }
 }
-
-
-?>

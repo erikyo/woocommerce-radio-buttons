@@ -1,0 +1,86 @@
+$mq__tablet-portrait: "(max-width : 767px)";
+
+$white: #fff;
+$gray-light: #f3f3f3;
+$gray: #ccc;
+$black: #000;
+$primary: var(--wp--preset--color--vivid-cyan-blue);
+
+// Reset WooCommerce default style
+.single-product table.variations {
+
+  .label label{
+    display: none;
+  }
+
+  table,
+  tr,
+  td {
+    padding: 0;
+    border: 0;
+  }
+}
+
+
+.single-product form.cart .radio__variations--list {
+	list-style: none;
+	margin: 0;
+}
+
+
+
+#radio_variations {
+  margin: 0;
+  padding: 0;
+
+  li {
+    position: relative;
+    display: inline-flex;
+    flex-wrap: nowrap;
+
+    min-width: 100px;
+    margin: 0 5px 5px 0;
+    padding: 0;
+  }
+
+  input[type="radio"] {
+    display: none;
+
+    & + label {
+      cursor: pointer;
+      margin: 0;
+      user-select: none;
+      transition: 175ms;
+      text-align: center;
+      width: 100%;
+
+
+      &:hover {
+        box-shadow: 0 0 0 2px $gray-light;
+      }
+    }
+
+    &.disabled + label {
+      color: $white;
+      background: $gray;
+      box-shadow: 0 0 0 1px	$gray-light;
+    }
+
+    &:checked + label {
+      background: $black;
+      color: $white;
+      font-weight: bold;
+    }
+  }
+}
+
+
+.reset_variations {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  font-size: 14px;
+  @media #{$mq__tablet-portrait} {
+    margin-top: 6px;
+    margin-bottom: 18px;
+  }
+}
