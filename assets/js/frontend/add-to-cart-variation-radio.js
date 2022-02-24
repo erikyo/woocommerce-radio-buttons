@@ -9,31 +9,33 @@ document.addEventListener('DOMContentLoaded', () => {
 		let count = 0;
 		let chosen = 0;
 
-		form.querySelectorAll('.variations .radio__variations--list').forEach(
+		form.querySelectorAll('.variations .wrb-list').forEach(
 			(radioList, index) => {
+				count++;
 				// the selected radio
 				const selected = radioList.querySelector('input:checked');
+				if (selected.parentElement.classList.contains('radio__none'))
+					return false;
 				// the name of the attribute
 				const attributeName =
 					radioList.dataset.attribute_name || selected.name;
 				const value = selected.value || false;
+				// update counters
 				if (value) chosen++;
-				count++;
 
 				const data = {};
 				data[attributeName] = value;
 
-				const el = {
+				formList[index] = {
 					count,
 					chosenCount: chosen,
 					data,
 				};
-
-				$form.trigger('check_variations', el);
-				formList[index] = el;
 			}
 		);
-		console.log(formList);
+
+		$form.trigger('check_variations', formList[formList.length - 1]);
+
 		return formList;
 	};
 
@@ -57,25 +59,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		// On clicking the reset variation button
 		form.querySelector('.reset_variations').addEventListener(
-			'change',
+			'click',
 			(event) => {
 				event.preventDefault();
 
-				form.querySelectorAll(
-					'.variations .radio__variations--list'
-				).forEach(function (el) {
-					el.querySelector('input[type="radio"]').checked = false;
+				form.querySelectorAll('.variations .wrb-list').forEach(
+					function (el) {
+						const radio = el.querySelector('input[type="radio"]');
+						radio.checked = false;
+					}
+				);
 
-					const firstInput = el.querySelector(
-						'.radio__variations--item:first-child input'
-					);
-					firstInput.checked = true;
-					firstInput.click();
-				});
+				form.querySelectorAll('.radio__none input').forEach(
+					(radioNone) => {
+						radioNone.checked = true;
+						radioNone.click();
+					}
+				);
 			}
 		);
-
-		// Custom callback to tell Woo to check variations with our radio attributes.
-		form.addEventListener('check_radio_variations', (el) => {});
 	});
 });

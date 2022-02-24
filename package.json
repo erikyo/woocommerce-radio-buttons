@@ -18,7 +18,7 @@
     "test:e2e": "wp-scripts test-e2e",
     "test:unit": "wp-scripts test-unit-js",
     "start:user-js": "wp-scripts start assets/js/frontend/add-to-cart-variation-radio.js --output-path=build/",
-    "build:user-js": "wp-scripts start assets/js/frontend/add-to-cart-variation-radio.js --output-path=build/",
+    "build:user-js": "wp-scripts build assets/js/frontend/add-to-cart-variation-radio.js --output-path=build/",
     "start:user-css": "wp-scripts start assets/css/woo-radio-variations.js --output-path=build/",
     "build:user-css": "wp-scripts build assets/css/woo-radio-variations.js --output-path=build/"
   },

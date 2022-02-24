@@ -35,12 +35,12 @@ jQuery(document).ready(function ($) {
 
 			$(this)
 				.closest('.variations_form')
-				.find('.variations .radio__variations--list')
+				.find('.variations .wrb-list')
 				.each(function () {
 					$(this).find('input:radio').attr('checked', false);
 
 					const $first_input = $(this).find(
-						'.radio__variations--item:first-child input:radio'
+						'.wrb-item:first-child input:radio'
 					);
 
 					if ('' === $first_input.val()) {
@@ -67,7 +67,7 @@ jQuery(document).ready(function ($) {
 		let count = 0;
 		let chosen = 0;
 
-		$form.find('.variations .radio__variations--list').each(function () {
+		$form.find('.variations .wrb-list').each(function () {
 			const attribute_name =
 				$(this).data('attribute_name') ||
 				$(this).find('input:radio').first().attr('name');
