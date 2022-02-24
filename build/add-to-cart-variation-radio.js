@@ -1735,48 +1735,46 @@ document.addEventListener('DOMContentLoaded', function () {
   var variationsForms = document.querySelectorAll('.variations_form');
   var $form = jQuery('.variations_form'); // Get chosen attributes from form.
 
-  var radioGetChosenAttributes = function radioGetChosenAttributes(el) {
-    var data = {};
+  var radioGetChosenAttributes = function radioGetChosenAttributes(form) {
+    var formList = [];
     var count = 0;
     var chosen = 0;
-    el.querySelectorAll('.variations .radio__variations--list').forEach(function (radio) {
-      // eslint-disable-next-line camelcase
-      var attribute_name = radio.dataset.attribute_name || radio.name;
-      var value = radio.val() || '';
+    form.querySelectorAll('.variations .radio__variations--list').forEach(function (radioList, index) {
+      // the selected radio
+      var selected = radioList.querySelector('input:checked'); // the name of the attribute
 
-      if (value.length > 0) {
-        chosen++;
-      }
-
-      count++; // eslint-disable-next-line camelcase
-
-      data[attribute_name] = value;
+      var attributeName = radioList.dataset.attribute_name || selected.name;
+      var value = selected.value || false;
+      if (value) chosen++;
+      count++;
+      var data = {};
+      data[attributeName] = value;
+      var el = {
+        count: count,
+        chosenCount: chosen,
+        data: data
+      };
+      $form.trigger('check_variations', el);
+      formList[index] = el;
     });
-    return {
-      count: count,
-      chosenCount: chosen,
-      data: data
-    };
+    console.log(formList);
+    return formList;
   };
 
   variationsForms.forEach(function (form) {
     form.addEventListener('wc_variation_form', function () {
-      $form.trigger('check_radio_variations');
+      radioGetChosenAttributes(form);
     });
-    form.querySelector('.variations input').addEventListener('change', function () {
-      var noMatchingVariations = form.querySelector('.wc-no-matching-variations');
-      if (noMatchingVariations) noMatchingVariations.remove();
+    form.querySelectorAll('.variations input').forEach(function (input) {
+      input.addEventListener('change', function () {
+        if (form.querySelector('.wc-no-matching-variations')) form.querySelector('.wc-no-matching-variations').remove();
 
-      if ($form.useAjax) {
-        $form.trigger('check_radio_variations');
-      } else {
-        $form.trigger('woocommerce_variation_select_change');
-        $form.trigger('check_radio_variations');
-      } // Custom event for when variation selection has been changed
+        if (!form.dataset.length) {
+          $form.trigger('woocommerce_variation_select_change');
+        }
 
-
-      $form.trigger('woocommerce_variation_has_changed');
-      $form.trigger('show_variation');
+        radioGetChosenAttributes(form);
+      });
     }); // On clicking the reset variation button
 
     form.querySelector('.reset_variations').addEventListener('change', function (event) {
@@ -1789,15 +1787,8 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }); // Custom callback to tell Woo to check variations with our radio attributes.
 
-    form.addEventListener('check_radio_variations', function (el) {
-      var chosenAttributes = radioGetChosenAttributes(el.target);
-      console.log(chosenAttributes);
-      $form.trigger('check_variations', chosenAttributes);
-    });
+    form.addEventListener('check_radio_variations', function (el) {});
   });
-});
-jQuery('form.variations_form').on('woocommerce_variation_has_changed', function () {
-  console.log('woocommerce_variation_has_changed');
 });
 }();
 /******/ })()

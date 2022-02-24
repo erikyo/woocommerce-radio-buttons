@@ -76,7 +76,7 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 		$options               = $args['options'];
 		$product               = $args['product'];
 		$attribute             = $args['attribute'];
-		$name                  = empty( $args['name'] ) ?: $attribute_clean_title;
+		$name                  = $args['name'] ?: $attribute_clean_title;
 		$id                    = $args['id'] ? sanitize_html_class( $attribute ) : 'wrc_' . $attribute_clean_title;
 		$class                 = $args['class'] ? sanitize_html_class( $attribute ) : $id;
 		$show_option_none      = boolval( $args['show_option_none'] );

@@ -22,7 +22,7 @@ const eslintConfig = {
 				next: ['const', 'let', 'var'],
 			},
 		],
-		'max-len': ['error', { code: 120, tabWidth: 8 }],
+		'max-len': ['error', { code: 160, tabWidth: 12 }],
 	},
 };
 

@@ -1,89 +1,81 @@
-jQuery(document).ready(function ($) {
-	/**
-	 * Variations form handling
-	 */
-	$('.variations_form')
-		.on('wc_variation_form', function (event, form) {
-			$(this).trigger('check_radio_variations');
-		})
+document.addEventListener('DOMContentLoaded', () => {
+	// the collection of variation sets
+	const variationsForms = document.querySelectorAll('.variations_form');
+	const $form = jQuery('.variations_form');
 
-		// Upon changing an option
-		.on('change', '.variations input:radio', function (event) {
-			const $form = $(this).closest('.variations_form');
-			const useAjax = false === $form.data('product_variations');
-
-			$form
-				.find('input[name="variation_id"], input.variation_id')
-				.val('')
-				.change();
-			$form.find('.wc-no-matching-variations').remove();
-
-			if (useAjax) {
-				$form.trigger('check_radio_variations');
-			} else {
-				$form.trigger('woocommerce_variation_select_change');
-				$form.trigger('check_radio_variations');
-			}
-
-			// Custom event for when variation selection has been changed
-			$form.trigger('woocommerce_variation_has_changed');
-		})
-
-		// On clicking the reset variation button
-		.on('click', '.reset_variations', function (event) {
-			event.preventDefault();
-
-			$(this)
-				.closest('.variations_form')
-				.find('.variations .radio__variations--list')
-				.each(function () {
-					$(this).find('input:radio').attr('checked', false);
-
-					const $first_input = $(this).find(
-						'.radio__variations--item:first-child input:radio'
-					);
-
-					if ('' === $first_input.val()) {
-						$first_input.attr('checked', true);
-					}
-					$first_input.change();
-				});
-		})
-
-		// Custom callback to tell Woo to check variations with our radio attributes.
-		.on('check_radio_variations', function (event) {
-			const chosenAttributes = radioGetChosenAttributes($(this));
-			$(this).trigger('check_variations', chosenAttributes);
-		});
-
-	/**
-	 * Get chosen attributes from form.
-	 *
-	 * @param  $form
-	 * @return array
-	 */
-	var radioGetChosenAttributes = function ($form) {
-		const data = {};
+	// Get chosen attributes from form.
+	const radioGetChosenAttributes = function (form) {
+		const formList = [];
 		let count = 0;
 		let chosen = 0;
 
-		$form.find('.variations .radio__variations--list').each(function () {
-			const attribute_name =
-				$(this).data('attribute_name') ||
-				$(this).find('input:radio').first().attr('name');
-			const value = $(this).find('input:checked').val() || '';
+		form.querySelectorAll('.variations .radio__variations--list').forEach(
+			(radioList, index) => {
+				// the selected radio
+				const selected = radioList.querySelector('input:checked');
+				// the name of the attribute
+				const attributeName =
+					radioList.dataset.attribute_name || selected.name;
+				const value = selected.value || false;
+				if (value) chosen++;
+				count++;
 
-			if (value.length > 0) {
-				chosen++;
+				const data = {};
+				data[attributeName] = value;
+
+				const el = {
+					count,
+					chosenCount: chosen,
+					data,
+				};
+
+				$form.trigger('check_variations', el);
+				formList[index] = el;
 			}
-
-			count++;
-			data[attribute_name] = value;
-		});
-		return {
-			count,
-			chosenCount: chosen,
-			data,
-		};
+		);
+		console.log(formList);
+		return formList;
 	};
+
+	variationsForms.forEach((form) => {
+		form.addEventListener('wc_variation_form', () => {
+			radioGetChosenAttributes(form);
+		});
+
+		form.querySelectorAll('.variations input').forEach((input) => {
+			input.addEventListener('change', () => {
+				if (form.querySelector('.wc-no-matching-variations'))
+					form.querySelector('.wc-no-matching-variations').remove();
+
+				if (!form.dataset.length) {
+					$form.trigger('woocommerce_variation_select_change');
+				}
+
+				radioGetChosenAttributes(form);
+			});
+		});
+
+		// On clicking the reset variation button
+		form.querySelector('.reset_variations').addEventListener(
+			'change',
+			(event) => {
+				event.preventDefault();
+
+				form.querySelectorAll(
+					'.variations .radio__variations--list'
+				).forEach(function (el) {
+					el.querySelector('input[type="radio"]').checked = false;
+
+					const firstInput = el.querySelector(
+						'.radio__variations--item:first-child input'
+					);
+					firstInput.checked = true;
+					firstInput.click();
+				});
+			}
+		);
+
+		// Custom callback to tell Woo to check variations with our radio attributes.
+		form.addEventListener('check_radio_variations', (el) => {});
+	});
 });
