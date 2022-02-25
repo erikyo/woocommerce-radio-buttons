@@ -2,18 +2,43 @@
 <ruleset name="WordPress Coding Standards">
 	<description>Sniffs for WordPress plugins</description>
 
-	<rule ref="PHPCompatibility"/>
+	<!-- Exclude the Composer. -->
+	<exclude-pattern>/vendor/*</exclude-pattern>
+
+	<!-- Exclude the Node Modules directory. -->
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+
+	<!-- Exclude dist directory -->
+	<exclude-pattern>/build/*</exclude-pattern>
+
+		<!-- Exclude test directory -->
+	<exclude-pattern>/tests/*</exclude-pattern>
+
+	<!-- Exclude minified Javascript files. -->
+	<exclude-pattern>*.min.js</exclude-pattern>
+
+  <!-- Configs -->
+  <config name="minimum_supported_wp_version" value="4.4" />
+
+  <!-- PHP Rules -->
+  <rule ref="PHPCompatibility"/>
 	<config name="testVersion" value="5.6-"/>
 
-	<rule ref="WordPress-Core"/>
+  <!-- Check all PHP files in directory tree by default. -->
+	<arg name="extensions" value="php"/>
+	<file>./woo-radio-buttons.php</file>
+
+  <!-- Show sniff codes in all reports -->
+  <arg value="ps"/>
+
+  <!-- Wordpress -->
+  <rule ref="WordPress-Core" />
 	<rule ref="WordPress-Docs"/>
 	<rule ref="WordPress.WP.I18n"/>
 	<config name="text_domain" value="wrb, woocommerce"/>
 
-	<arg value="ps"/>
-	<arg name="extensions" value="php"/>
-
-	<file>./woo-radio-buttons.php</file>
+  <!-- WooCommerce Rules -->
+  <rule ref="WooCommerce-Core" />
 
 	// allow ternary operator
   <rule ref="WordPress.PHP.DisallowShortTernary">

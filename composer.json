@@ -19,20 +19,35 @@
 		"squizlabs/php_codesniffer": "^3.5",
 		"wp-coding-standards/wpcs": "^2.2",
 		"wp-phpunit/wp-phpunit": "^5.8",
-		"yoast/phpunit-polyfills": "^1.0"
+		"yoast/phpunit-polyfills": "^1.0",
+		"brainmaestro/composer-git-hooks": "^2.8",
+		"woocommerce/woocommerce-sniffs": "^0.1.2"
 	},
 	"require": {
 		"composer/installers": "~1.0"
 	},
 	"scripts": {
-		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
-		"lint": "phpcs --standard=phpcs.xml.dist",
-		"test": "phpunit -c phpunit.xml.dist --verbose"
+		"format": "vendor/bin/phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
+		"lint": "vendor/bin/phpcs --standard=phpcs.xml.dist",
+		"test": "vendor/bin/phpunit -c phpunit.xml.dist --verbose",
+		"post-install-cmd": "cghooks add --ignore-lock",
+		"post-update-cmd": "cghooks update"
 	},
 	"config": {
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"composer/installers": true
+		}
+	},
+	"extra": {
+		"hooks": {
+			"pre-commit": [
+				"vendor/bin/phpcs --standard=phpcs.xml.dist"
+			],
+			"pre-push": [
+				"vendor/bin/phpunit -c phpunit.xml.dist"
+			],
+			"post-merge": "composer update"
 		}
 	}
 }
