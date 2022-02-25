@@ -47,11 +47,11 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 	 * Output a list of variation attributes for use in the cart forms.
 	 *
 	 * @param array $args this plugin options.
-	 *
 	 * @since 2.4.0
 	 */
 	function wc_dropdown_variation_attribute_options( array $args = array() ) {
 		$args = wp_parse_args(
+			// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHooksComment
 			apply_filters( 'woocommerce_dropdown_variation_attribute_options_args', $args ),
 			array(
 				'options'          => false,
@@ -67,20 +67,20 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 
 		// Get selected value.
 		if ( false === $args['selected'] && $args['attribute'] && $args['product'] instanceof WC_Product ) {
-			$selected_key     = 'attribute_' . sanitize_title( $args['attribute'] );
-			$args['selected'] = isset( $_REQUEST[ $selected_key ] ) ? wc_clean( wp_unslash( $_REQUEST[ $selected_key ] ) ) : $args['product']->get_variation_default_attribute( $args['attribute'] ); // WPCS: input var ok, CSRF ok, sanitization ok.
+			$selected_key = 'attribute_' . sanitize_title( $args['attribute'] );
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended
+			$args['selected'] = isset( $_REQUEST[ $selected_key ] ) ? wc_clean( wp_unslash( $_REQUEST[ $selected_key ] ) ) : $args['product']->get_variation_default_attribute( $args['attribute'] );
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 		}
-
-		$attribute_clean_title = sanitize_title( $args['attribute'] );
 
 		$options               = $args['options'];
 		$product               = $args['product'];
 		$attribute             = $args['attribute'];
-		$name                  = $args['name'] ?: $attribute_clean_title;
-		$id                    = sanitize_html_class( $args['id'] ) ?: 'wrc_' . $attribute_clean_title;
-		$class                 = sanitize_html_class( $args['class'] ) ?: $attribute_clean_title;
-		$show_option_none      = boolval( $args['show_option_none'] );
-		$show_option_none_text = $args['show_option_none'] ?: __( 'None', 'woocommerce' ); // We'll do our best to hide the placeholder, but we'll need to show something when resetting options.
+		$name                  = $args['name'] ? $args['name'] : 'attribute_' . sanitize_title( $attribute );
+		$id                    = $args['id'] ? $args['id'] : sanitize_title( $attribute );
+		$class                 = $args['class'];
+		$show_option_none      = (bool) $args['show_option_none'];
+		$show_option_none_text = $args['show_option_none'] ? $args['show_option_none'] : __( 'Choose an option', 'woocommerce' ); // We'll do our best to hide the placeholder, but we'll need to show something when resetting options.
 
 		if ( empty( $options ) && ! empty( $product ) && ! empty( $attribute ) ) {
 			$attributes = $product->get_variation_attributes();
@@ -91,21 +91,35 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 
 		if ( ! empty( $options ) ) {
 
+			$opt = array(
+				'name'      => esc_attr( $name ),
+				'attribute' => esc_attr( sanitize_title( $attribute ) ),
+			);
+
 			$html .= '<div class="wrb">';
 
 			/* translators: %s: the name of the attribute, will print something like "Choose color" or "Choose size" */
-			$html .= '<p class="product-attribute attribute-' . $attribute_clean_title . '">' . sprintf( esc_html( __( 'Choose %s', 'woocommerce' ) ), wc_attribute_label( $attribute ) ) . '</p>';
+			$html .= '<p class="product-attribute attribute-' . $opt['name'] . '">' . sprintf( esc_html( __( 'Choose %s', 'woocommerce' ) ), wc_attribute_label( $attribute ) ) . '</p>';
 
-			$html .= sprintf( '<ul id="%s" class="wrb-list %s" data-attribute_name="%s">', $id, $class, $args['attribute'] );
+			/* TODO: fix this because ul doesn't allow attribute "name" */
+			$html .= sprintf(
+				'<ul id="%s" class="wrb-list %s" name="%s" data-attribute_name="attribute_%s" data-show_option_none="%s">',
+				intval( $id ),
+				esc_attr( $class ),
+				$opt['name'],
+				$opt['attribute'],
+				$show_option_none ? 'yes' : 'no'
+			);
 
 			if ( $show_option_none ) {
 				$input_id = uniqid( 'attribute_' );
 				$html    .= sprintf(
 					'<li class="wrb-item radio__none"><input id="radio__%s" type="radio" name="%s" value="" %s /><label class="button" for="radio__%s">%s</label></li>',
 					esc_attr( $input_id ),
-					esc_attr( $name ),
+					$opt['name'],
 					checked( sanitize_title( $args['selected'] ), '', false ),
 					esc_attr( $input_id ),
+					// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHooksComment
 					esc_html( apply_filters( 'woocommerce_variation_option_none_radio', $show_option_none_text, $product ) )
 				);
 			}
@@ -125,28 +139,31 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 						$input_id = uniqid( 'attribute_' );
 						$html    .= sprintf(
 							'<li class="wrb-item attribute_%s radio__term"><input id="radio__%s" type="radio" name="%s" value="%s" %s/><label class="button" for="radio__%s">%s</label></li>',
-							$term->slug,
+							esc_attr( $term->slug ),
 							esc_attr( $input_id ),
-							esc_attr( $name ),
+							$opt['name'],
 							esc_attr( $term->slug ),
 							checked( sanitize_title( $args['selected'] ), $term->slug, false ),
 							esc_attr( $input_id ),
+							// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHooksComment
 							esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name, $term, $attribute, $product ) )
 						);
 					}
 				}
 			} else {
 				foreach ( $options as $option ) {
+					// This handles < 2.4.0 bw compatibility where text attributes were not sanitized.
 					$input_id = uniqid( 'attribute_' );
 					$selected = checked( $args['selected'], sanitize_title( $option ), false );
 					$html    .= sprintf(
 						'<li class="wrb-item attribute_%s radio__option"><input id="radio__%s" type="radio" name="%s" value="%s" %s><label class="button" for="radio__%s">%s</label></li>',
 						$option,
 						esc_attr( $input_id ),
-						esc_attr( $name ),
+						$opt['name'],
 						esc_attr( $option ),
 						$selected,
 						esc_attr( $input_id ),
+						// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHooksComment
 						esc_html( apply_filters( 'woocommerce_variation_option_name', $option, null, $attribute, $product ) )
 					);
 				}
@@ -155,6 +172,7 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 			echo '</ul></div>';
 		}
 
-		echo apply_filters( 'woocommerce_dropdown_variation_attribute_options_html', $html, $args ); // WPCS: XSS ok.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo apply_filters( 'woocommerce_dropdown_variation_attribute_options_html', $html, $args );
 	}
 }

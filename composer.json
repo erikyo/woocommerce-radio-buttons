@@ -27,9 +27,9 @@
 		"composer/installers": "~1.0"
 	},
 	"scripts": {
-		"format": "vendor/bin/phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
-		"lint": "vendor/bin/phpcs --standard=phpcs.xml.dist",
-		"test": "vendor/bin/phpunit -c phpunit.xml.dist --verbose",
+		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
+		"lint": "phpcs --standard=phpcs.xml.dist",
+		"test": "phpunit -c phpunit.xml.dist --verbose",
 		"post-install-cmd": "cghooks add --ignore-lock",
 		"post-update-cmd": "cghooks update"
 	},
@@ -42,10 +42,10 @@
 	"extra": {
 		"hooks": {
 			"pre-commit": [
-				"vendor/bin/phpcs --standard=phpcs.xml.dist"
+				"phpcs --standard=phpcs.xml.dist"
 			],
 			"pre-push": [
-				"vendor/bin/phpunit -c phpunit.xml.dist"
+				"phpunit -c phpunit.xml.dist"
 			],
 			"post-merge": "composer update"
 		}
