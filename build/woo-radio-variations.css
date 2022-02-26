@@ -1,26 +1,26 @@
 /*!*************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./assets/css/woo-radio-variations.scss ***!
   \*************************************************************************************************************************************************************************************************************************************************************/
-.single-product table.variations .label label {
+.product table.variations .label label {
   display: none;
-}
-.single-product table.variations table,
-.single-product table.variations tr,
-.single-product table.variations td {
-  padding: 0;
-  border: 0;
-}
-
-.single-product form.cart .wrb-list {
-  list-style: none;
-  margin: 0;
 }
 
 #main .wrb {
   margin: 0;
   padding: 0;
 }
-#main .wrb li {
+#main .wrb table {
+  padding: 0;
+}
+#main .wrb table tr,
+#main .wrb table td {
+  border: 0;
+}
+#main .wrb ul.wrb-list {
+  list-style: none;
+  margin: 0;
+}
+#main .wrb ul.wrb-list li {
   position: relative;
   display: inline-flex;
   flex-wrap: nowrap;
@@ -55,14 +55,16 @@
   color: #fff;
   font-weight: bold;
 }
-
-.reset_variations {
+#main .wrb .radio__none input + label {
+  background: silver;
+}
+#main .wrb .reset_variations {
   margin-top: 10px;
   margin-bottom: 30px;
   font-size: 14px;
 }
 @media (max-width : 767px) {
-  .reset_variations {
+  #main .wrb .reset_variations {
     margin-top: 6px;
     margin-bottom: 18px;
   }

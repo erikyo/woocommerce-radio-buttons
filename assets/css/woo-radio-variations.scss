@@ -6,46 +6,48 @@ $gray: #ccc;
 $black: #000;
 $primary: var(--wp--preset--color--vivid-cyan-blue);
 
-// Reset WooCommerce default style
-.single-product table.variations {
+// WooCommerce Plugin - Radio Button Style
 
-  .label label{
-    display: none;
-  }
-
-  table,
-  tr,
-  td {
-    padding: 0;
-    border: 0;
-  }
+// removes the original woocommerce label (will be replaced with "Choose xyz")
+.product table.variations .label label {
+  display: none;
 }
-
-
-.single-product form.cart .wrb-list {
-	list-style: none;
-	margin: 0;
-}
-
-
 
 #main .wrb {
   margin: 0;
   padding: 0;
 
-  li {
-    position: relative;
-    display: inline-flex;
-    flex-wrap: nowrap;
-
-    min-width: 100px;
-    margin: 0 5px 5px 0;
+  // Reset WooCommerce default style
+  table {
     padding: 0;
+
+    tr,
+    td {
+      border: 0;
+    }
   }
 
+
+  ul.wrb-list {
+    list-style: none;
+    margin: 0;
+
+    li {
+      position: relative;
+      display: inline-flex;
+      flex-wrap: nowrap;
+
+      min-width: 100px;
+      margin: 0 5px 5px 0;
+      padding: 0;
+    }
+  }
+
+  // the button style
   input[type="radio"] {
     display: none;
 
+    // Default
     & + label {
       cursor: pointer;
       margin: 0;
@@ -60,27 +62,35 @@ $primary: var(--wp--preset--color--vivid-cyan-blue);
       }
     }
 
+    // Disabled
     &.disabled + label {
       color: $white;
       background: $gray;
-      box-shadow: 0 0 0 1px	$gray-light;
+      box-shadow: 0 0 0 1px $gray-light;
     }
 
+    // Checked
     &:checked + label {
       background: $black;
       color: $white;
       font-weight: bold;
     }
   }
-}
 
+  // None selected button
+  .radio__none input + label {
+    background: darken($gray-light, 20%);
+  }
 
-.reset_variations {
-  margin-top: 10px;
-  margin-bottom: 30px;
-  font-size: 14px;
-  @media #{$mq__tablet-portrait} {
-    margin-top: 6px;
-    margin-bottom: 18px;
+  .reset_variations {
+    margin-top: 10px;
+    margin-bottom: 30px;
+    font-size: 14px;
+    @media #{$mq__tablet-portrait} {
+      margin-top: 6px;
+      margin-bottom: 18px;
+    }
   }
 }
+
+

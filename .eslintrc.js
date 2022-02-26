@@ -23,11 +23,13 @@ const eslintConfig = {
 			},
 		],
 		'max-len': ['error', { code: 160, tabWidth: 12 }],
+		'array-element-newline': ['error', { multiline: true }],
 	},
 };
 
 eslintConfig.parserOptions = {
 	ecmaVersion: 6,
+	env: { es6: true },
 	babelOptions: {
 		presets: [require.resolve('@wordpress/babel-preset-default')],
 	},

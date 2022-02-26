@@ -51,7 +51,7 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 	 */
 	function wc_dropdown_variation_attribute_options( array $args = array() ) {
 		$args = wp_parse_args(
-			// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHooksComment
+			// Filters the variation option name for custom option slugs.
 			apply_filters( 'woocommerce_dropdown_variation_attribute_options_args', $args ),
 			array(
 				'options'          => false,
@@ -80,8 +80,9 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 		$id                    = $args['id'] ? $args['id'] : sanitize_title( $attribute );
 		$class                 = $args['class'];
 		$show_option_none      = (bool) $args['show_option_none'];
-		$show_option_none_text = $args['show_option_none'] ? $args['show_option_none'] : __( 'Choose an option', 'woocommerce' ); // We'll do our best to hide the placeholder, but we'll need to show something when resetting options.
+		$show_option_none_text = $args['show_option_none'] ? $args['show_option_none'] : __( 'Choose an option', 'woocommerce' );
 
+		// We'll do our best to hide the placeholder, but we'll need to show something when resetting options.
 		if ( empty( $options ) && ! empty( $product ) && ! empty( $attribute ) ) {
 			$attributes = $product->get_variation_attributes();
 			$options    = $attributes[ $attribute ];
@@ -98,7 +99,7 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 
 			$html .= '<div class="wrb">';
 
-			/* translators: %s: the name of the attribute, will print something like "Choose color" or "Choose size" */
+			/* translators: %s: name of the taxonomy ("Choose %s" => "Choose color" or "Choose size") */
 			$html .= '<p class="product-attribute attribute-' . $opt['name'] . '">' . sprintf( esc_html( __( 'Choose %s', 'woocommerce' ) ), wc_attribute_label( $attribute ) ) . '</p>';
 
 			/* TODO: fix this because ul doesn't allow attribute "name" */
@@ -114,12 +115,13 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 			if ( $show_option_none ) {
 				$input_id = uniqid( 'attribute_' );
 				$html    .= sprintf(
-					'<li class="wrb-item radio__none"><input id="radio__%s" type="radio" name="%s" value="" %s /><label class="button" for="radio__%s">%s</label></li>',
+					'<li class="wrb-item %s term_none attr_ radio__none"><input id="radio__%s" type="radio" name="%s" value="" %s /><label class="button" for="radio__%s">%s</label></li>',
+					$opt['name'],
 					esc_attr( $input_id ),
 					$opt['name'],
 					checked( sanitize_title( $args['selected'] ), '', false ),
 					esc_attr( $input_id ),
-					// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHooksComment
+					// Filters the variation option name for custom option slugs.
 					esc_html( apply_filters( 'woocommerce_variation_option_none_radio', $show_option_none_text, $product ) )
 				);
 			}
@@ -138,14 +140,15 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 					if ( in_array( $term->slug, $options, true ) ) {
 						$input_id = uniqid( 'attribute_' );
 						$html    .= sprintf(
-							'<li class="wrb-item attribute_%s radio__term"><input id="radio__%s" type="radio" name="%s" value="%s" %s/><label class="button" for="radio__%s">%s</label></li>',
+							'<li class="wrb-item %s term_%s radio__term"><input id="radio__%s" type="radio" name="%s" value="%s" %s/><label class="button" for="radio__%s">%s</label></li>',
+							$opt['name'],
 							esc_attr( $term->slug ),
 							esc_attr( $input_id ),
 							$opt['name'],
 							esc_attr( $term->slug ),
 							checked( sanitize_title( $args['selected'] ), $term->slug, false ),
 							esc_attr( $input_id ),
-							// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHooksComment
+							// Filters the variation option name for custom option slugs.
 							esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name, $term, $attribute, $product ) )
 						);
 					}
@@ -156,14 +159,15 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 					$input_id = uniqid( 'attribute_' );
 					$selected = checked( $args['selected'], sanitize_title( $option ), false );
 					$html    .= sprintf(
-						'<li class="wrb-item attribute_%s radio__option"><input id="radio__%s" type="radio" name="%s" value="%s" %s><label class="button" for="radio__%s">%s</label></li>',
+						'<li class="wrb-item %s term_%s radio__option"><input id="radio__%s" type="radio" name="%s" value="%s" %s><label class="button" for="radio__%s">%s</label></li>',
+						$opt['name'],
 						$option,
 						esc_attr( $input_id ),
 						$opt['name'],
 						esc_attr( $option ),
 						$selected,
 						esc_attr( $input_id ),
-						// phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHooksComment
+						// Filters the variation option name for custom option slugs.
 						esc_html( apply_filters( 'woocommerce_variation_option_name', $option, null, $attribute, $product ) )
 					);
 				}
