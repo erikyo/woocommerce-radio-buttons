@@ -20,7 +20,8 @@
     "start:user-js": "wp-scripts start assets/js/frontend/add-to-cart-variation-radio.js --output-path=build/",
     "build:user-js": "wp-scripts build assets/js/frontend/add-to-cart-variation-radio.js --output-path=build/",
     "start:user-css": "wp-scripts start assets/css/woo-radio-variations.js --output-path=build/",
-    "build:user-css": "wp-scripts build assets/css/woo-radio-variations.js --output-path=build/"
+    "build:user-css": "wp-scripts build assets/css/woo-radio-variations.js --output-path=build/",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
   },
   "homepage": "https://github.com/helgatheviking/woocommerce-radio-buttons#readme",
   "devDependencies": {
-    "@wordpress/scripts": "^21.0.2"
+    "@wordpress/scripts": "^21.0.2",
+    "husky": "^7.0.4"
   }
 }
