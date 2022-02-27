@@ -1,186 +1,219 @@
-document.addEventListener('DOMContentLoaded', () => {
-	const $form = jQuery('.variations_form');
+document.addEventListener("DOMContentLoaded", () => {
+  const $form = jQuery(".variations_form");
 
-	/**
-	 * @param {Array} variationAttributes - The Array of Product Attributes -> {attribute_logo: "Yes", attribute_pa_color: "blue"}
-	 * @param {Array} attributes          - the selected attribute to match with the variation Attributes -> {attribute_pa_color: "green"}
-	 */
-	const isMatch = (variationAttributes, attributes) => {
-		let match = true;
+  /**
+   * @param {Object} variationAttributes - The Array of Product Attributes -> {attribute_logo: "Yes", attribute_pa_color: "blue"}
+   * @param {Object} attributes          - the selected attribute to match with the variation Attributes -> {attribute_pa_color: "green"}
+   */
+  const isMatch = (variationAttributes, attributes) => {
+    let match = true;
 
-		for (const attrName in variationAttributes)
-			if (variationAttributes.hasOwnProperty(attrName)) {
-				const val1 = variationAttributes[attrName];
-				const val2 = attributes[attrName];
-				if (
-					val1 !== undefined &&
-					val2 !== undefined &&
-					val1.length !== 0 &&
-					val2.length !== 0 &&
-					val1 !== val2
-				)
-					match = false;
-			}
+    for (const attrName in variationAttributes)
+      if (variationAttributes.hasOwnProperty(attrName)) {
+        const val1 = variationAttributes[attrName];
+        const val2 = attributes[attrName];
+        if (
+          val1 !== undefined &&
+          val2 !== undefined &&
+          val1.length !== 0 &&
+          val2.length !== 0 &&
+          val1 !== val2
+        )
+          match = false;
+      }
 
-		return match;
-	};
+    return match;
+  };
 
-	/**
-	 * Search into current array and return the variation with the given attributes
-	 *
-	 * @param {Array} variations - the array of variations -> [0: {attributes: {…}, …},1: {attributes: {…}, …},2: {attributes: {…}, …}, …] length: 3
-	 * @param {Array} attributes -the selected attributes -> {attribute_pa_color: "green"}
-	 * @return {Array} matched - the matching variation from the array attributes
-	 */
-	const findMatchingVariations = (variations, attributes) => {
-		const matching = [];
-		for (let i = 0; i < variations.length; i++) {
-			const variation = variations[i];
+  /**
+   * Search into current array and return the variation with the given attributes
+   *
+   * @param {Object} variations - the array of variations -> [0: {attributes: {…}, …},1: {attributes: {…}, …},2: {attributes: {…}, …}, …] length: 3
+   * @param {Object} attributes -the selected attributes -> {attribute_pa_color: "green"}
+   * @return {Object} matched variations - the matching variation from the array attributes
+   */
+  const findMatchingVariations = (variations, attributes) => {
+    const matching = [];
+    for (let i = 0; i < variations.length; i++) {
+      const variation = variations[i];
 
-			if (isMatch(variation.attributes, attributes))
-				matching.push(variation);
-		}
-		return matching;
-	};
+      if (isMatch(variation.attributes, attributes)) matching.push(variation);
+    }
+    return matching;
+  };
 
-	/**
-	 * Get chosen attributes from form.
-	 *
-	 * @param {Element} form - the form where this plugin is playing
-	 * @return {Array} formList - the product available with the current selection
-	 */
-	const radioGetChosenAttributes = (form) => {
-		const data = {};
-		const formList = [];
-		let count = 0;
-		let chosen = 0;
+  const matchVariation = (attributes, variation) => {
+    try {
+      attributes.forEach((data) => {
+        if (
+          data.attributes[variation.name] &&
+          data.attributes[variation.name] === variation.value
+        ) {
+          throw "true";
+        }
+      });
+      // element value was never found into data attributes
+      return false;
+    } catch (e) {
+      if (e === "true") {
+        return true;
+      }
+    }
+  };
 
-		form.querySelectorAll('.variations .wrb-list').forEach(
-			(radioList, index) => {
-				count++;
-				// the selected radio
-				const selected = radioList.querySelector('input:checked');
-				if (selected.parentElement.classList.contains('radio__none'))
-					return false;
-				// the name of the attribute
-				const attributeName =
-					radioList.dataset.attribute_name || selected.name;
-				const value = selected.value || false;
-				// update counters
-				if (value) chosen++;
+  /**
+   * Get chosen attributes from form.
+   *
+   * @param {Element} form - the form where this plugin is playing
+   * @return {Object} formList - the product available with the current selection
+   */
+  const radioGetChosenAttributes = (form) => {
+    const data = {};
+    let formList;
+    let count = 0;
+    let chosen = 0;
 
-				data[attributeName] = value;
+    form.querySelectorAll(".variations .wrb-list").forEach((radioList) => {
+      count++;
 
-				formList[index] = {
-					count,
-					chosenCount: chosen,
-					data,
-				};
-			}
-		);
+      /*
+       * selected: the selected radio
+       * name: the term
+       */
+      const selected = radioList.querySelector("input:checked");
+      if (selected.parentElement.classList.contains("radio__none"))
+        return false;
+      const attributeName = radioList.dataset.attribute_name || selected.name;
+      const value = selected.value || false;
 
-		$form.trigger('check_variations', formList[formList.length - 1]);
+      if (value) chosen++; // update counters
 
-		return formList;
-	};
+      data[attributeName] = value;
 
-	/**
-	 * @param {Element} button - disable this button
-	 */
-	const disableButton = (button) => {
-		button.classList.add('disabled');
-		button.classList.remove('active');
-		console.log(button.textContent + ' disabled');
-	};
+      formList = {
+        count,
+        chosenCount: chosen,
+        data,
+      };
+    });
 
-	/**
-	 * @param {Element} button - enable this button
-	 */
-	const enableButton = (button) => {
-		button.classList.remove('disabled');
-		button.classList.add('active');
-		console.log(button.textContent + ' enabled');
-	};
+    $form.trigger("check_variations", formList);
 
-	/* Loops for each collection of variation... */
-	document.querySelectorAll('.variations_form').forEach((form) => {
-		const inputs = form.querySelectorAll('.variations input');
-		const formData = JSON.parse(form.dataset.product_variations);
-		console.log(formData);
+    return formList;
+  };
 
-		/* Loops for each input of the collection */
-		inputs.forEach((input) => {
-			/*
-			 * listen for this input change
-			 * */
-			input.addEventListener('change', () => {
-				if (form.querySelector('.wc-no-matching-variations'))
-					form.querySelector('.wc-no-matching-variations').remove();
+  /**
+   * @param {Element} button - disable this button
+   */
+  const disableButton = (button) => {
+    button.classList.add("disabled");
+    button.classList.remove("active");
+    // console.log(button.name + button.value + " disabled");
+  };
 
-				// update dataset if ajax isn't enabled
-				if (!form.dataset.length)
-					$form.trigger('woocommerce_variation_select_change');
+  /**
+   * @param {Element} button - enable this button
+   */
+  const enableButton = (button) => {
+    button.classList.remove("disabled");
+    // console.log(button.name + ":" + button.value + " enabled");
+  };
 
-				// Refresh the variations array (used to find matching products)
-				const chosenAttributes = radioGetChosenAttributes(form);
+  /* Loops for each collection of variation... */
+  document.querySelectorAll(".variations_form").forEach((form) => {
+    const inputs = form.querySelectorAll(".variations input");
+    const formData = JSON.parse(form.dataset.product_variations);
 
-				// Fetch the variations array in order to find matching terms
-				const inputsData = findMatchingVariations(
-					formData,
-					chosenAttributes[chosenAttributes.length - 1].data
-				);
-				console.log(inputsData);
+    /* Loops for each input of the collection */
+    inputs.forEach((current) => {
+      /*
+       * listen for this input changes
+       */
+      current.addEventListener("click", () => {
+        if (form.querySelector(".wc-no-matching-variations"))
+          form.querySelector(".wc-no-matching-variations").remove();
 
-				inputs.forEach((i) => {
-					console.log(i);
-					if (i.name === input.name) {
-						// the input match the taxonomy
-						if (i !== input)
-							// the other button of the same tax will be disabled
-							disableButton(i.nextElementSibling);
-						// the enabled option
-						else enableButton(i.nextElementSibling);
-					} else if (!i.checked) {
-						// the input DOESN'T match the taxonomy
-						inputsData.forEach((data) => {
-							if (
-								Object.values(data.attributes).includes(
-									i.value
-								) &&
-								Object.keys(data.attributes).includes(i.name)
-							)
-								enableButton(i.nextElementSibling);
-							else disableButton(i.nextElementSibling);
-						});
-					} else if (!i.value) {
-						// !i.value is the "none button"
-						//enableButton(i.nextElementSibling);
-					}
-				});
-			});
-		});
+        // update dataset if ajax isn't enabled
+        if (!form.dataset.length)
+          $form.trigger("woocommerce_variation_select_change");
 
-		// On clicking the reset variation button
-		form.querySelector('.reset_variations').addEventListener(
-			'click',
-			(event) => {
-				event.preventDefault();
+        /*
+         * Fired if the input is active
+         */
+        if (current.classList.contains("active")) {
+          const parentUL = current.parentElement.parentElement;
+          parentUL.querySelectorAll(`input`).forEach((inputWithTerm) => {
+            inputWithTerm.classList.remove("active");
+          });
+          const radioNone = parentUL.querySelector(`.radio__none input`);
+          radioNone.click();
+        } else {
+          /*
+           * Refresh the variations array (used to find matching products)
+           * first we get the attributes
+           */
+          const chosenAttributes = radioGetChosenAttributes(form);
 
-				form.querySelectorAll(
-					'.variations .wrb-list input[type="radio"]'
-				).forEach((radio) => {
-					radio.checked = false;
-					enableButton(radio.nextElementSibling);
-				});
+          /*
+           * Fetch the variations array in order to find matching terms
+           */
+          const matchingVariations = chosenAttributes
+            ? findMatchingVariations(formData, chosenAttributes.data)
+            : {};
 
-				form.querySelectorAll('.radio__none input').forEach(
-					(noneButton) => {
-						noneButton.checked = true;
-						noneButton.click();
-						enableButton(noneButton.nextElementSibling);
-					}
-				);
-			}
-		);
-	});
+          // then for each input
+          inputs.forEach((input) => {
+            // if the input match the taxonomy or
+            // if the none button was clicked
+            if (input.name === current.name || !current.value) {
+              if (!current.value) {
+                // if the current was the none button
+                enableButton(input);
+                if (input.value && !input.checked)
+                  input.classList.remove("active");
+              } else if (input === current) {
+                // if the selected input is the current
+                enableButton(input);
+                input.classList.add("active");
+              } else {
+                // the other button of the same tax will be disabled
+                disableButton(input);
+              }
+            } else if (input.checked) {
+              // enableButton(input);
+            } else if (
+              // if the button is the none button or
+              // the current taxonomy match the selected input taxonomy
+              // disable the siblings button
+              matchVariation(matchingVariations, input)
+            ) {
+              enableButton(input);
+            } else {
+              /* the input DOESN'T match the taxonomy AND is checked */
+              disableButton(input);
+              input.classList.remove("active");
+            }
+          });
+        }
+      });
+    });
+
+    /* On clicking the reset variation button */
+    form
+      .querySelector(".reset_variations")
+      .addEventListener("click", (event) => {
+        event.preventDefault();
+        form
+          .querySelectorAll('.variations .wrb-list input[type="radio"]')
+          .forEach((radio) => {
+            radio.checked = false;
+            enableButton(radio);
+          });
+        form.querySelectorAll(".radio__none input").forEach((noneButton) => {
+          noneButton.checked = true;
+          noneButton.click();
+          enableButton(noneButton);
+        });
+      });
+  });
 });

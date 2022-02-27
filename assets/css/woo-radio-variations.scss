@@ -3,7 +3,7 @@ $mq__tablet-portrait: "(max-width : 767px)";
 $white: #fff;
 $gray-light: #f3f3f3;
 $gray: #ccc;
-$black: #000;
+$black: #222;
 $primary: var(--wp--preset--color--vivid-cyan-blue);
 
 // WooCommerce Plugin - Radio Button Style
@@ -49,37 +49,38 @@ $primary: var(--wp--preset--color--vivid-cyan-blue);
 
     // Default
     & + label {
+      box-sizing: border-box;
       cursor: pointer;
       margin: 0;
       user-select: none;
-      transition: 175ms;
+      transition: 350ms;
       text-align: center;
       width: 100%;
-
-
-      &:hover {
-        box-shadow: 0 0 0 2px $gray-light;
-      }
     }
 
     // Disabled
     &.disabled + label {
-      color: $white;
-      background: $gray;
-      box-shadow: 0 0 0 1px $gray-light;
+      //border: 1px solid $gray;
+      background: $gray-light;
+      color: $gray;
+    }
+
+    // None selected button
+    .radio__none input + label {
+      color: $gray-light;
     }
 
     // Checked
     &:checked + label {
       background: $black;
       color: $white;
-      font-weight: bold;
     }
-  }
 
-  // None selected button
-  .radio__none input + label {
-    background: darken($gray-light, 20%);
+    // Active
+    &.active + label {
+      background: $black;
+      background: hsl(185,40%,60%);
+    }
   }
 
   .reset_variations {

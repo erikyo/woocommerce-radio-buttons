@@ -115,7 +115,7 @@ if ( ! function_exists( 'wc_dropdown_variation_attribute_options' ) ) {
 			if ( $show_option_none ) {
 				$input_id = uniqid( 'attribute_' );
 				$html    .= sprintf(
-					'<li class="wrb-item %s term_none attr_ radio__none"><input id="radio__%s" type="radio" name="%s" value="" %s /><label class="button" for="radio__%s">%s</label></li>',
+					'<li class="wrb-item %s term_none attr_none radio__none"><input id="radio__%s" type="radio" name="%s" value="" %s /><label class="button" for="radio__%s">%s</label></li>',
 					$opt['name'],
 					esc_attr( $input_id ),
 					$opt['name'],

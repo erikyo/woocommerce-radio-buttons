@@ -1,5 +1,5 @@
 /*!*************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[4].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].use[3]!./assets/css/woo-radio-variations.scss ***!
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./assets/css/woo-radio-variations.scss ***!
   \*************************************************************************************************************************************************************************************************************************************************************/
 .product table.variations .label label {
   display: none;
@@ -32,31 +32,31 @@
   display: none;
 }
 #main .wrb input[type=radio] + label {
+  box-sizing: border-box;
   cursor: pointer;
   margin: 0;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
-  transition: 175ms;
+  transition: 350ms;
   text-align: center;
   width: 100%;
 }
-#main .wrb input[type=radio] + label:hover {
-  box-shadow: 0 0 0 2px #f3f3f3;
-}
 #main .wrb input[type=radio].disabled + label {
-  color: #fff;
-  background: #ccc;
-  box-shadow: 0 0 0 1px #f3f3f3;
+  background: #f3f3f3;
+  color: #ccc;
+}
+#main .wrb input[type=radio] .radio__none input + label {
+  color: #f3f3f3;
 }
 #main .wrb input[type=radio]:checked + label {
-  background: #000;
+  background: #222;
   color: #fff;
-  font-weight: bold;
 }
-#main .wrb .radio__none input + label {
-  background: silver;
+#main .wrb input[type=radio].active + label {
+  background: #222;
+  background: #70bbc2;
 }
 #main .wrb .reset_variations {
   margin-top: 10px;
