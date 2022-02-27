@@ -4,10 +4,10 @@
   "description": "Woocommerce Radio Buttons",
   "private": true,
   "scripts": {
-		"start": "wp-scripts start",
+		"start": "wp-scripts start assets/css/woo-radio-variations.js assets/js/frontend/add-to-cart-variation-radio.js --output-path=build/",
 		"start:user-js": "wp-scripts start assets/js/frontend/add-to-cart-variation-radio.js --output-path=build/",
 		"start:user-css": "wp-scripts start assets/css/woo-radio-variations.js --output-path=build/",
-    "build": "wp-scripts build",
+    "build": "wp-scripts build assets/css/woo-radio-variations.js assets/js/frontend/add-to-cart-variation-radio.js --output-path=build/",
 		"build:user-js": "wp-scripts build assets/js/frontend/add-to-cart-variation-radio.js --output-path=build/",
 		"build:user-css": "wp-scripts build assets/css/woo-radio-variations.js --output-path=build/",
     "check-engines": "wp-scripts check-engines",

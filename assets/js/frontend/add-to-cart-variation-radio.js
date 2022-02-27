@@ -179,13 +179,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 // the other button of the same tax will be disabled
                 disableButton(input);
               }
-            } else if (input.checked) {
-              // enableButton(input);
             } else if (
               // if the button is the none button or
               // the current taxonomy match the selected input taxonomy
               // disable the siblings button
-              matchVariation(matchingVariations, input)
+              (!input.checked, matchVariation(matchingVariations, input))
             ) {
               enableButton(input);
             } else {
